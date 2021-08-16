@@ -1,56 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def costFunction(X, y, theta):
-    '''
-    >>> X = np.array([[1, 2], [1, 3], [1, 4], [1, 5]])
-    >>> y = np.array([7, 6, 5, 4])
-    >>> theta = np.array([0.1, 0.2])
-    >>> costFunction(X, y, theta)
-    11.945
-
-    >>> X = np.array([[1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 6]])
-    >>> y = np.array([[7], [6], [5], [4]])
-    >>> theta = np.array([[0.1], [0.2], [0.3]])
-    >>> costFunction(X, y, theta)
-    7.017499999999999
-    '''
-    m = len(X)
-    h = np.dot(X, theta)
-    return 1/(2*len(X)) * np.sum((h - y)**2)
-
-def gradientDescent(X, y, theta, alpha, iterations=1000, intercept=True):
-    '''
-    >>> X = np.array([[1, 5], [1, 2], [1, 4], [1, 5]])
-    >>> y = np.array([[1], [6], [4], [2]])
-    >>> theta = np.array([[0], [0]])
-    >>> alpha = 0.01
-    >>> iterations = 1000
-    >>> gradientDescent(X, y, theta, alpha, iterations)
-    np.array([[5.21475495], [-0.57334591]])
-
-    >>> X = np.array([[1, 5], [1, 2]])
-    >>> y = np.array([[1], [6]])
-    >>> theta = np.array([[0.5], [0.5]])
-    >>> alpha = 0.1
-    >>> iterations = 10
-    >>> gradientDescent(X, y, theta, alpha, iterations, intercept=True)
-    np.array([[1.70986322], [0.19229354]])
-    '''
-    m = len(X)
-    for i in range(iterations):
-        x = X[:, 1:]
-        h = theta[0, :] + np.dot(x, theta[1:, :])
-        theta_zero = theta[0, :] - alpha * (1/m) * np.sum(h-y)
-        theta_one = theta[1, :] - alpha * (1/m) * np.sum((h-y) * x)
-        theta = np.array([theta_zero, theta_one])
-    return theta
+from lib import costFunction, gradientDescent, magic, featureNormalize
 
 if __name__ == '__main__':
 
-    import doctest
-    doctest.testmod(verbose=True)
-
+    # single variable
     data = np.loadtxt('ex1data1.txt', delimiter=',')
     X = data[:, 0]
     y = data[:, 1]
@@ -72,7 +27,7 @@ if __name__ == '__main__':
     theta = np.zeros((2, 1))
     iterations = 1500
     alpha = 0.01
-    theta_min = gradientDescent(X_, y_, theta, alpha, iterations)
+    theta_min, j_history_01 = gradientDescent(X_, y_, theta, alpha, iterations)
     print(theta_min)
 
     J = costFunction(X_, y_, theta_min)
@@ -82,3 +37,18 @@ if __name__ == '__main__':
     ax.scatter(X, y, marker='x', color='red')
     ax.plot(X, np.dot(X_, theta_min).reshape(-1), color='blue')
     plt.show()
+
+    # Multi variables
+    print("<Multi variables>")
+    data = np.loadtxt('ex1data2.txt', delimiter=',')
+    X = data[:, 0:2]
+    y = data[:, 2]
+    y_ = y.reshape(len(y), 1)
+    m = len(X)
+
+    X = np.insert(featureNormalize(X), 0, 1, axis=1)
+
+    alpha = 0.01
+    num_iters = 400
+    theta = np.zeros((3, 1))
+    theta, j_history_02 = gradientDescent(X, y_, theta, alpha, iterations=num_iters, intercept=True, debug=True)
