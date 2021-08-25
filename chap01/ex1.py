@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from lib import costFunction, gradientDescent, magic, featureNormalize
+from lib import costFunction, gradientDescent, featureNormalize
 
 if __name__ == '__main__':
 
@@ -28,7 +28,8 @@ if __name__ == '__main__':
     iterations = 1500
     alpha = 0.01
     theta_min, j_history_01 = gradientDescent(X_, y_, theta, alpha, iterations)
-    print(theta_min)
+    print('Expected theta values (approx) \n -3.6303, 1.1664')
+    print('Got theta values \n', theta_min)
 
     J = costFunction(X_, y_, theta_min)
     print(J)
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     ax.plot(X, np.dot(X_, theta_min).reshape(-1), color='blue')
     plt.show()
 
-    if True: # 3D mesh grid
+    if False: # 3D mesh grid
         import pandas as pd
         from lib import gradientDescentHistory
         h = gradientDescentHistory(X_, y_, theta, alpha, iterations=iterations, intercept=True,debug=False)
@@ -52,17 +53,19 @@ if __name__ == '__main__':
         plt.savefig('gradient-descend-3d.png')
 
 
-    # # Multi variables
-    # print("<Multi variables>")
-    # data = np.loadtxt('ex1data2.txt', delimiter=',')
-    # X = data[:, 0:2]
-    # y = data[:, 2]
-    # y_ = y.reshape(len(y), 1)
-    # m = len(X)
+    # Multi variables
+    print("<Multi variables>")
+    data = np.loadtxt('ex1data2.txt', delimiter=',')
+    X = data[:, 0:2]
+    y = data[:, 2]
+    y_ = y.reshape(len(y), 1)
+    m = len(X)
 
-    # X = np.insert(featureNormalize(X), 0, 1, axis=1)
+    X = np.insert(featureNormalize(X), 0, 1, axis=1)
 
-    # alpha = 0.01
-    # num_iters = 400
-    # theta = np.zeros((3, 1))
-    # theta, j_history_02 = gradientDescent(X, y_, theta, alpha, iterations=num_iters, intercept=True, debug=True)
+    alpha = 0.01
+    num_iters = 400
+    theta = np.zeros((3, 1))
+    theta, j_history_02 = gradientDescent(X, y_, theta, alpha, iterations=num_iters, intercept=True, debug=False)
+    print('Got theta values \n', theta)
+    print('Got J minimum \n', j_history_02[-1])

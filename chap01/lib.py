@@ -1,81 +1,20 @@
-import doctest
-doctest.testmod(verbose=True)
-
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def costFunction(X, y, theta):
-    '''
-    >>> X = np.array([[1, 2], [1, 3], [1, 4], [1, 5]])
-    >>> y = np.array([7, 6, 5, 4])
-    >>> theta = np.array([0.1, 0.2])
-    >>> costFunction(X, y, theta)
-    11.945
-
-    >>> X = np.array([[1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 6]])
-    >>> y = np.array([[7], [6], [5], [4]])
-    >>> theta = np.array([[0.1], [0.2], [0.3]])
-    >>> costFunction(X, y, theta)
-    7.017499999999999
-
-    >>> X = np.array([[2, 1, 3], [7, 1, 9], [1, 8, 1], [3, 7, 4]])
-    >>> y = np.array([[2], [5], [5], [6]])
-    >>> theta = np.array([[0.4], [0.6], [0.8]])
-    >>> np.round(costFunction(X, y, theta), 5)
-    5.295
-    '''
     m = len(X)
     h = np.dot(X, theta)
     return 1/(2*m) * np.sum((h - y)**2)
 
 def featureNormalize(X):
-    '''
-    >>> featureNormalize(np.array([[1], [2], [3]]))
-    array([[-1.],
-           [ 0.],
-           [ 1.]])
-    >>> featureNormalize(magic(3))
-    array([[ 1.09544512, -1.46059349,  0.36514837],
-           [-0.73029674,  0.        ,  0.73029674],
-           [-0.36514837,  1.46059349, -1.09544512]])
-    '''
     return (X - np.mean(X)) / np.std(X, ddof=1)
 
-def gradientDescent(X, y, theta, alpha, iterations=1000, intercept=True, debug=False):
-    '''
-    >>> X = np.array([[1, 5], [1, 2], [1, 4], [1, 5]])
-    >>> y = np.array([[1], [6], [4], [2]])
-    >>> theta = np.array([[0], [0]])
-    >>> alpha = 0.01
-    >>> iterations = 1000
-    >>> theta_min, j_hist = gradientDescent(X, y, theta, alpha, iterations)
-    >>> theta_min
-    array([[ 5.21475495],
-           [-0.57334591]])
-    >>> X = np.array([[1, 5], [1, 2]])
-    >>> y = np.array([[1], [6]])
-    >>> theta = np.array([[0.5], [0.5]])
-    >>> alpha = 0.1
-    >>> iterations = 10
-    >>> theta_min, j_hist = gradientDescent(X, y, theta, alpha, iterations, intercept=True)
-    >>> theta_min
-    array([[1.70986322],
-           [0.19229354]])
-    >>> j_hist
-    [5.8853124999999995, 5.713851953124999, 5.547543844726562, 5.386121367211915, 5.229408872324786, 5.0772597232631576, 4.929538399473597, 4.7861152864668055, 4.646865103463483, 4.5116663759254]
-    >>> X = np.array([[2, 1, 3], [7, 1, 9], [1, 8, 1], [3, 7, 4]])
-    >>> y = np.array([[2], [5], [5], [6]])
-    >>> theta = np.array([[0.1], [-0.2], [0.3]])
-    >>> theta_min, j_hist = gradientDescent(X, y, theta, 0.01, 10, intercept=False)
-    >>> theta_min
-    array([[0.1855552 ],
-           [0.50436048],
-           [0.40137032]])
-    >>> j_hist
-    [3.6325468281249997, 1.7660945058596678, 1.0215168888342592, 0.6410083828332604, 0.41530550708361225, 0.272296292180201, 0.17938440052798005, 0.11847852136163604, 0.07842876888755221, 0.05206494606885677]
-    '''
+def gradientDescent(X, y, theta, alpha, iterations=1000, intercept=True, history=False, debug=False):
     m, n = X.shape
     j_history = []
+    theta_history = []
     for i in range(iterations):
         if intercept:
           x = X[:, 1:]
@@ -83,7 +22,6 @@ def gradientDescent(X, y, theta, alpha, iterations=1000, intercept=True, debug=F
           theta_zero = theta[0, :] - alpha * (1/m) * np.sum(h-y)
           # theta_one = theta[1:, :] - alpha * (1/m) * np.sum((h-y) * x)
           theta_one = theta[1:, :] - alpha * (1/m) * np.dot(x.T, (h-y))
-          # theta = np.array([theta_zero, theta_one])
           theta = np.insert(theta_one, 0, theta_zero).reshape(-1, 1)
           if debug:
             print(i)
@@ -95,8 +33,28 @@ def gradientDescent(X, y, theta, alpha, iterations=1000, intercept=True, debug=F
           h = np.dot(X, theta)
           theta = theta - alpha * (1/m) * np.dot(X.T, (h - y))
           # theta = theta - alpha * (1/m) * np.sum((h - y)*X) Can you explain why this is uncorrect ?? 
-        j_history.append(costFunction(X, y, theta))
-    return theta, j_history
+          if debug:
+            print(i)
+            print(theta)
+        j = costFunction(X, y, theta)
+        
+        if history:
+          theta_history.append(theta)
+          j_history.append(j)
+    if history:
+      return theta_history, j_history
+    else:
+      return theta, j
+
+def plotCostSurface(theta0_hist, theta1_hist, j_hist):
+    
+    df = pd.DataFrame({'theta0': theta0_hist, 'theta1': theta1_hist, 'j':j_hist})
+    M, B = np.meshgrid(df['theta0'].values, df['theta1'].values)
+    Z = np.meshgrid(df['j'].values, df['j'].values)[0]
+    fig = plt.figure(figsize=(20, 10))
+    ax = fig.add_subplot(111, projection='3d')
+    surf = ax.plot_surface(M, B, Z, rstride=1, cstride=1, cmap="plasma")
+    fig.colorbar(surf)
 
 def gradientDescentHistory(X, y, theta, alpha, iterations=1000, intercept=True, debug=False):
     m, n = X.shape
@@ -126,9 +84,3 @@ def gradientDescentHistory(X, y, theta, alpha, iterations=1000, intercept=True, 
         theta1_history.append(float(theta[1]))
         j_history.append(costFunction(X, y, theta))
     return theta0_history, theta1_history, j_history
-
-
-if __name__ == '__main__':
-
-  import doctest
-  doctest.testmod(verbose=True)
