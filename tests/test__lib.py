@@ -1,6 +1,11 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+
 import numpy as np
 
-from lib import costFunction, gradientDescent, featureNormalize
+from lib import costFunction, featureNormalize, gradientDescent
+
 
 def test__costFunction():
 
