@@ -8,6 +8,21 @@ def costFunction(X, y, theta):
     h = np.dot(X, theta)
     return 1/(2*m) * np.sum((h - y)**2)
 
+def lrCostFunction(X, y, theta):
+    m = X.shape[0]
+    h = sigmoid(np.dot(X, theta))
+    J = 1/m*sum(-y*np.log(h) - (1-y)*(np.log(1-h)))
+    grad = 1/m*(np.dot(X.T,(h - y)))
+    return J, grad
+
+def lrCostFunctionReg(X, y, theta, alpha):
+    m = X.shape[0]
+    h = sigmoid(np.dot(X, theta))
+    theta_reg = np.r_[np.zeros([1, 1]), theta[1:, :]]
+    J = 1/m*sum(-y*np.log(h) - (1-y)*(np.log(1-h))) + alpha/(2*m)*sum(theta_reg**2) 
+    grad = 1/m*(np.dot(X.T,(h - y))) + alpha/m * theta_reg
+    return J, grad
+
 def featureNormalize(X):
     return (X - np.mean(X)) / np.std(X, ddof=1)
 
@@ -56,31 +71,35 @@ def plotCostSurface(theta0_hist, theta1_hist, j_hist):
     surf = ax.plot_surface(M, B, Z, rstride=1, cstride=1, cmap="plasma")
     fig.colorbar(surf)
 
-def gradientDescentHistory(X, y, theta, alpha, iterations=1000, intercept=True, debug=False):
-    m, n = X.shape
-    theta0_history = []
-    theta1_history = []
-    j_history = []
-    for i in range(iterations):
-        if intercept:
-          x = X[:, 1:]
-          h = theta[0, :] + np.dot(x, theta[1:, :])
-          theta_zero = theta[0, :] - alpha * (1/m) * np.sum(h-y)
-          # theta_one = theta[1:, :] - alpha * (1/m) * np.sum((h-y) * x)
-          theta_one = theta[1:, :] - alpha * (1/m) * np.dot(x.T, (h-y))
-          # theta = np.array([theta_zero, theta_one])
-          theta = np.insert(theta_one, 0, theta_zero).reshape(-1, 1)
-          if debug:
-            print(i)
-            print(theta_zero)
-            print(theta_one)
-            print(theta)
+# def gradientDescentHistory(X, y, theta, alpha, iterations=1000, intercept=True, debug=False):
+#     m, n = X.shape
+#     theta0_history = []
+#     theta1_history = []
+#     j_history = []
+#     for i in range(iterations):
+#         if intercept:
+#           x = X[:, 1:]
+#           h = theta[0, :] + np.dot(x, theta[1:, :])
+#           theta_zero = theta[0, :] - alpha * (1/m) * np.sum(h-y)
+#           # theta_one = theta[1:, :] - alpha * (1/m) * np.sum((h-y) * x)
+#           theta_one = theta[1:, :] - alpha * (1/m) * np.dot(x.T, (h-y))
+#           # theta = np.array([theta_zero, theta_one])
+#           theta = np.insert(theta_one, 0, theta_zero).reshape(-1, 1)
+#           if debug:
+#             print(i)
+#             print(theta_zero)
+#             print(theta_one)
+#             print(theta)
 
-        else:
-          h = np.dot(X, theta)
-          theta = theta - alpha * (1/m) * np.dot(X.T, (h - y))
-          # theta = theta - alpha * (1/m) * np.sum((h - y)*X) Can you explain why this is uncorrect ?? 
-        theta0_history.append(float(theta[0]))
-        theta1_history.append(float(theta[1]))
-        j_history.append(costFunction(X, y, theta))
-    return theta0_history, theta1_history, j_history
+#         else:
+#           h = np.dot(X, theta)
+#           theta = theta - alpha * (1/m) * np.dot(X.T, (h - y))
+#           # theta = theta - alpha * (1/m) * np.sum((h - y)*X) Can you explain why this is uncorrect ?? 
+#         theta0_history.append(float(theta[0]))
+#         theta1_history.append(float(theta[1]))
+#         j_history.append(costFunction(X, y, theta))
+#     return theta0_history, theta1_history, j_history
+
+def sigmoid(X):
+    z = np.multiply(X, -1)
+    return 1/(1 + np.exp(z))

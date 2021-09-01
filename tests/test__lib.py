@@ -5,6 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 import numpy as np
 
 from lib import costFunction, featureNormalize, gradientDescent
+from lib import lrCostFunction, lrCostFunctionReg
 
 
 def test__costFunction():
@@ -63,3 +64,18 @@ def test__gradientDescent():
     np.testing.assert_allclose(j_hist, 
                         np.array([3.6325468, 1.7660945, 1.0215168, 0.6410083, 0.4153055, 0.2722962, 0.1793844, 0.1184785, 0.0784287, 0.0520649]),
                         rtol=1e-06)
+
+def test__lrCostFunction():
+
+    theta = np.array([[-2], [-1], [1], [2]])
+    X = np.array([[1., 0.1, 0.6, 1.1], [1., 0.2, 0.7, 1.2], [1., 0.3, 0.8, 1.3], [1., 0.4, 0.9, 1.4], [1., 0.5, 1., 1.5]])
+    y = np.array([[1], [0], [1], [0], [1]])
+    J, grad = lrCostFunction(X, y, theta)
+
+    np.testing.assert_allclose(J, np.array([0.73482]), rtol=1e-06)
+    np.testing.assert_allclose(grad, np.array([[0.146561], [0.051442], [0.124722], [0.198003]]), rtol=1e-05)
+
+    J, grad = lrCostFunctionReg(X, y, theta, 3)
+
+    np.testing.assert_allclose(J, np.array([2.534819]), rtol=1e-06)
+    np.testing.assert_allclose(grad, np.array([[0.146561], [-0.54856], [0.72472], [1.39800]]), rtol=1e-05)
