@@ -10,26 +10,14 @@ def costFunction(X, y, theta):
 def featureNormalize(X):
     return (X - np.mean(X)) / np.std(X, ddof=1)
 
-def gradientDescent(X, y, theta, alpha, iterations=1000, history=False, debug=False):
+def gradientDescent(X, y, theta, alpha, iterations=1000):
     m, n = X.shape
     j_history = []
-    theta_history = []
     for i in range(iterations):
         h = np.dot(X, theta)
         theta = theta - alpha * (1/m) * np.dot(X.T, (h - y))
-        j = costFunction(X, y, theta)
-
-        if debug:
-          print(i)
-          print(theta)
-      
-        if history:
-          theta_history.append(theta)
-          j_history.append(j)
-    if history:
-      return theta_history, j_history
-    else:
-      return theta, j
+        j_history.append(costFunction(X, y, theta))
+    return theta, j_history
 
 def plotCostSurface(theta0_hist, theta1_hist, j_hist):
     
