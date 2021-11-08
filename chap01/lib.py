@@ -10,33 +10,19 @@ def costFunction(X, y, theta):
 def featureNormalize(X):
     return (X - np.mean(X)) / np.std(X, ddof=1)
 
-def gradientDescent(X, y, theta, alpha, iterations=1000, intercept=True, history=False, debug=False):
+def gradientDescent(X, y, theta, alpha, iterations=1000, history=False, debug=False):
     m, n = X.shape
     j_history = []
     theta_history = []
     for i in range(iterations):
-        if intercept:
-          x = X[:, 1:]
-          h = theta[0, :] + np.dot(x, theta[1:, :])
-          theta_zero = theta[0, :] - alpha * (1/m) * np.sum(h-y)
-          # theta_one = theta[1:, :] - alpha * (1/m) * np.sum((h-y) * x)
-          theta_one = theta[1:, :] - alpha * (1/m) * np.dot(x.T, (h-y))
-          theta = np.insert(theta_one, 0, theta_zero).reshape(-1, 1)
-          if debug:
-            print(i)
-            print(theta_zero)
-            print(theta_one)
-            print(theta)
-
-        else:
-          h = np.dot(X, theta)
-          theta = theta - alpha * (1/m) * np.dot(X.T, (h - y))
-          # theta = theta - alpha * (1/m) * np.sum((h - y)*X) Can you explain why this is uncorrect ?? 
-          if debug:
-            print(i)
-            print(theta)
+        h = np.dot(X, theta)
+        theta = theta - alpha * (1/m) * np.dot(X.T, (h - y))
         j = costFunction(X, y, theta)
-        
+
+        if debug:
+          print(i)
+          print(theta)
+      
         if history:
           theta_history.append(theta)
           j_history.append(j)
