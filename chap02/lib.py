@@ -2,38 +2,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def gradientDescent(X, y, theta, alpha, iterations=1000, intercept=True, history=False, debug=False):
-    m, n = X.shape
+def gradientDescent(X, y, theta, alpha, iterations=1000):
     j_history = []
-    theta_history = []
     for i in range(iterations):
-        if intercept:
-          x = X[:, 1:]
-          h = theta[0, :] + np.dot(x, theta[1:, :])
-          theta_zero = theta[0, :] - alpha * (1/m) * np.sum(h-y)
-          theta_one = theta[1:, :] - alpha * (1/m) * np.dot(x.T, (h-y))
-          theta = np.insert(theta_one, 0, theta_zero).reshape(-1, 1)
-          if debug:
-            print(i)
-            print(theta_zero)
-            print(theta_one)
-            print(theta)
-
-        else:
-          h = np.dot(X, theta)
-          theta = theta - alpha * (1/m) * np.dot(X.T, (h - y))
-          if debug:
-            print(i)
-            print(theta)
         J, grad = lrCostFunction(X, y, theta)
-        
-        if history:
-          theta_history.append(theta)
-          j_history.append(J)
-    if history:
-      return theta_history, j_history
-    else:
-      return theta, J
+        theta = theta - alpha * grad
+        j_history.append(J)
+    return theta, j_history
 
 def hessian(Xtil, yhat, tol=1e-10):
     r = np.clip(yhat * (1 - yhat), tol, np.inf)

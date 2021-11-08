@@ -32,7 +32,7 @@ if __name__ == '__main__':
     X = data[:, 0:2]
     m, n = X.shape
     y = data[:, 2]
-    X_ = np.hstack((np.ones((m, 1)), X))
+    X_ = np.c_[np.ones(m), X]
     y_ = y.reshape(m, 1)
     theta = np.zeros((n+1, 1))
 
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     alpha = 0.00015
     iterations = 30000
     theta = np.array([[0], [0], [0]])
-    theta_min, J = gradientDescent(X_, y_, theta, alpha, iterations, intercept=True, debug=False)
+    theta_min, J = gradientDescent(X_, y_, theta, alpha, iterations)
     J, grad = lrCostFunction(X_, y_, theta_min)
 
     print('Cost at theta found by gradient descent: %0.5f' % J[0])
@@ -56,10 +56,8 @@ if __name__ == '__main__':
 
     # newton optimize
     theta = np.array([0, 0, 0])
-    Xtil = np.c_[np.ones(X.shape[0]), X]
-    print(theta.shape)
-    print(Xtil.shape)
-    theta_min = newtonOptimize(Xtil, y, theta, max_iter=6)
+    Xtil = np.c_[np.ones(m), X]
+    theta_min, j_min = newtonOptimize(Xtil, y, theta, max_iter=6)
     J, _ = lrCostFunction(Xtil, y, theta_min)
       
     print('Cost at theta found by fminunc: %0.5f' % J)
