@@ -1,9 +1,21 @@
-# machine-learning-basics
+# Outline
 
-outline
 1. linear regression    | doc | ex | test
 2. logistic regression  | doc | ex | test
 3. neural network       | doc | ex | test
+
+# Before starting session
+
+- Run below code
+
+```shell
+$ git remote -v # Get remote branch name
+
+$ git pull origin REMOTE_BRANCH_NAME # pull remote branch contents
+
+# If an error is raised, try below command. After then, run above line.
+$ git stash
+```
 
 # 1. linear regression
 
